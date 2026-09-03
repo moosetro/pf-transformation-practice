@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Parent Function Transformations Practice</title>
+<style>
+  :root{
+    --bg:#f7f7f2;
+    --panel:#ffffff;
+    --panel2:#f0eff5;
+    --text:#121a2b;
+    --muted:#657087;
+    --border:#d7d9df;
+    --purple:#432c65;
+    --purple2:#6a4593;
+    --blue:#76a2c5;
+    --orange:#d55d33;
+    --gold:#ea9a4a;
+    --green:#2f7d5b;
+    --red:#b4473b;
+    --shadow:0 8px 26px rgba(18,26,43,.08);
+    --radius:18px;
+  }
+  body.dark{
+    --bg:#121a2b;
+    --panel:#1b2539;
+    --panel2:#222e45;
+    --text:#f7f7f2;
+    --muted:#b7bfd0;
+    --border:#34415a;
+    --purple:#8a67bc;
+    --purple2:#a688cf;
+    --blue:#76a2c5;
+    --orange:#ea7b52;
+    --gold:#f0ae62;
+    --green:#63b68f;
+    --red:#e2766a;
+    --shadow:0 10px 28px rgba(0,0,0,.22);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height:1.35;
+    transition:background .2s,color .2s;
+  }
+  button,input,select{font:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 18px 50px}
+  header{margin-bottom:18px}
+  .eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--purple2)}
+  h1{font-size:clamp(1.85rem,4vw,3rem);line-height:1.05;margin:.25rem 0 .45rem}
+  .subtitle{color:var(--muted);font-size:1.02rem;margin:0;max-width:760px}
+  .settings{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:12px;
+    margin:20px 0 16px;
+  }
+  .setting-card{
+    grid-column:span 4;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:15px;
+    box-shadow:var(--shadow);
+  }
+  .setting-card.wide{grid-column:span 6}
+  .setting-card.full{grid-column:1/-1}
+  .setting-card h2{
+    font-size:.83rem;
+    text-transform:uppercase;
+    letter-spacing:.075em;
+    color:var(--muted);
+    margin:0 0 11px;
+  }
+  .segmented,.chips{display:flex;flex-wrap:wrap;gap:8px}
+  .segmented button,.chip,.choice,.action{
+    border:1px solid var(--border);
+    background:var(--panel2);
+    color:var(--text);
+    border-radius:12px;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .segmented button,.chip{padding:8px 11px;font-weight:700;font-size:.9rem}
+  .segmented button:hover,.chip:hover,.choice:hover{border-color:var(--purple2);transform:translateY(-1px)}
+  .segmented button.active,.chip.active{
+    background:var(--purple);
+    border-color:var(--purple);
+    color:white;
+  }
+  .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .toggle-line{
+    display:flex;align-items:center;gap:9px;
+    padding:8px 10px;background:var(--panel2);border:1px solid var(--border);border-radius:11px;
+    font-weight:650;font-size:.9rem;
+  }
+  .toggle-line input{accent-color:var(--purple2);width:17px;height:17px}
+  .session-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stat{background:var(--panel2);border-radius:11px;padding:9px;text-align:center}
+  .stat b{display:block;font-size:1.15rem}
+  .stat span{color:var(--muted);font-size:.76rem;font-weight:750;text-transform:uppercase;letter-spacing:.04em}
+  .reset-link{margin-top:9px;border:0;background:transparent;color:var(--purple2);font-weight:750;cursor:pointer;padding:0}
+  .problem-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .problem-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+    padding:20px 22px;border-bottom:1px solid var(--border);
+  }
+  .problem-head h2{margin:0 0 4px;font-size:1.35rem}
+  .problem-head p{margin:0;color:var(--muted)}
+  .badge{white-space:nowrap;background:var(--panel2);border:1px solid var(--border);border-radius:999px;padding:7px 11px;font-size:.8rem;font-weight:800;color:var(--muted)}
+  .problem-body{padding:22px}
+  .parent-label{font-size:.82rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+  .parent-name{font-weight:800;color:var(--purple2);margin-bottom:14px}
+  .equation-box{
+    min-height:88px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;
+    border:1px solid var(--border);background:var(--panel2);border-radius:16px;padding:18px;
+    margin-bottom:18px;text-align:center;
+  }
+  .equation{font-family:"Cambria Math","Times New Roman",serif;font-size:clamp(1.65rem,4vw,2.45rem);line-height:1.25}
+  .notation{font-family:"Cambria Math","Times New Roman",serif;font-size:clamp(1.25rem,3vw,1.75rem);color:var(--muted)}
+  .prompt{font-weight:800;margin:6px 0 12px}
+  .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .choice{
+    padding:13px 14px;text-align:left;font-weight:720;min-height:54px;
+    display:flex;align-items:center;
+  }
+  .choice.selected{outline:3px solid color-mix(in srgb,var(--purple2) 35%, transparent);border-color:var(--purple2)}
+  .choice.correct{background:color-mix(in srgb,var(--green) 16%,var(--panel));border-color:var(--green)}
+  .choice.wrong{background:color-mix(in srgb,var(--red) 14%,var(--panel));border-color:var(--red)}
+  .multi-grid{display:flex;flex-wrap:wrap;gap:9px}
+  .multi-chip{padding:10px 13px;border:1px solid var(--border);border-radius:999px;background:var(--panel2);color:var(--text);font-weight:720;cursor:pointer}
+  .multi-chip.selected{background:var(--purple);color:#fff;border-color:var(--purple)}
+  .multi-chip.correct{box-shadow:inset 0 0 0 2px var(--green)}
+  .builder{display:grid;gap:12px}
+  .builder-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .builder-slot{
+    min-height:46px;flex:1;min-width:230px;border:2px dashed var(--border);border-radius:12px;padding:7px;display:flex;flex-wrap:wrap;gap:7px;align-items:center
+  }
+  .builder-token{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:10px;padding:8px 10px;font-weight:720;cursor:pointer}
+  .builder-token.used{opacity:.38}
+  .feedback{
+    margin-top:16px;border-radius:14px;padding:13px 15px;display:none;
+    border:1px solid var(--border);background:var(--panel2)
+  }
+  .feedback.show{display:block}
+  .feedback.good{border-color:var(--green)}
+  .feedback.bad{border-color:var(--red)}
+  .feedback strong{display:block;margin-bottom:3px}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .action{padding:11px 16px;font-weight:800}
+  .action.primary{background:var(--purple);border-color:var(--purple);color:#fff}
+  .action.secondary{background:var(--panel2)}
+  .action:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .graph-wrap{
+    display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:20px
+  }
+  .graph-wrap.show{display:block}
+  .graph-title{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:8px}
+  .graph-title h3{margin:0;font-size:1rem}
+  .legend{display:flex;gap:12px;font-size:.8rem;color:var(--muted);font-weight:700}
+  .legend span::before{content:"";display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px;border-radius:3px;background:var(--purple2)}
+  .legend .parent::before{background:var(--blue)}
+  canvas{display:block;width:100%;height:360px;border-radius:14px;background:var(--panel2);border:1px solid var(--border)}
+  .small-note{color:var(--muted);font-size:.82rem;margin-top:8px}
+  .footer-note{text-align:center;color:var(--muted);font-size:.82rem;margin-top:18px}
+  @media(max-width:900px){
+    .setting-card,.setting-card.wide{grid-column:span 6}
+  }
+  @media(max-width:650px){
+    .setting-card,.setting-card.wide,.setting-card.full{grid-column:1/-1}
+    .choices{grid-template-columns:1fr}
+    .check-grid{grid-template-columns:1fr}
+    .problem-head{flex-direction:column}
+    .session-row{grid-template-columns:repeat(2,1fr)}
+    canvas{height:310px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Algebra Practice</div>
+    <h1>Parent Function Transformations</h1>
+    <p class="subtitle">Recognize how equations transform parent functions. Start with one change at a time, then combine translations, reflections, and dilations.</p>
+  </header>
+
+  <section class="settings">
+    <div class="setting-card wide">
+      <h2>Difficulty</h2>
+      <div class="segmented" id="difficulty">
+        <button data-value="basic" class="active">Basic</button>
+        <button data-value="intermediate">Intermediate</button>
+        <button data-value="advanced">Advanced</button>
+        <button data-value="mixed">Mixed</button>
+      </div>
+    </div>
+
+    <div class="setting-card wide">
+      <h2>Practice mode</h2>
+      <div class="segmented" id="practiceMode">
+        <button data-value="recognize4" class="active">Recognition — 4</button>
+        <button data-value="recognize6">Recognition — 6</button>
+        <button data-value="identify">Identify all</button>
+        <button data-value="build">Build description</button>
+        <button data-value="match">Match equation ↔ description</button>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <h2>Equation display</h2>
+      <div class="segmented" id="displayMode">
+        <button data-value="equation" class="active">Actual equation</button>
+        <button data-value="function">Function notation</button>
+        <button data-value="both">Both</button>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <h2>Number of transformations</h2>
+      <div class="segmented" id="transformCount">
+        <button data-value="1" class="active">1</button>
+        <button data-value="2">2</button>
+        <button data-value="3">3</button>
+        <button data-value="4">4</button>
+      </div>
+    </div>
+
+    <div class="setting-card">
+      <h2>Appearance</h2>
+      <div class="segmented" id="appearance">
+        <button data-value="light" class="active">Light</button>
+        <button data-value="dark">Dark</button>
+      </div>
+    </div>
+
+    <div class="setting-card wide">
+      <h2>Transformation families</h2>
+      <div class="check-grid">
+        <label class="toggle-line"><input type="checkbox" id="famTranslation" checked> Translation</label>
+        <label class="toggle-line"><input type="checkbox" id="famFlip"> Reflection</label>
+        <label class="toggle-line"><input type="checkbox" id="famVertical"> Vertical dilation</label>
+        <label class="toggle-line"><input type="checkbox" id="famHorizontal"> Horizontal dilation</label>
+      </div>
+    </div>
+
+    <div class="setting-card wide">
+      <h2>Parent functions</h2>
+      <div class="check-grid" id="functionToggles"></div>
+    </div>
+
+    <div class="setting-card full">
+      <h2>Session</h2>
+      <div class="session-row">
+        <div class="stat"><b id="correctStat">0</b><span>Correct</span></div>
+        <div class="stat"><b id="attemptStat">0</b><span>Attempted</span></div>
+        <div class="stat"><b id="streakStat">0</b><span>Streak</span></div>
+        <div class="stat"><b id="accuracyStat">—</b><span>Accuracy</span></div>
+      </div>
+      <button class="reset-link" id="resetStats">Reset session stats</button>
+    </div>
+  </section>
+
+  <main class="problem-card">
+    <div class="problem-head">
+      <div>
+        <h2 id="problemTitle">Recognize the transformation</h2>
+        <p id="problemSubtitle">Read the equation first. The graph appears after you answer.</p>
+      </div>
+      <div class="badge" id="difficultyBadge">Basic · 1 transformation</div>
+    </div>
+
+    <div class="problem-body">
+      <div class="parent-label">Parent function</div>
+      <div class="parent-name" id="parentName"></div>
+
+      <div class="equation-box" id="equationBox"></div>
+      <div class="prompt" id="promptText"></div>
+      <div id="responseArea"></div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="actions">
+        <button class="action primary" id="checkBtn">Check answer</button>
+        <button class="action secondary" id="newBtn">New problem</button>
+      </div>
+
+      <div class="graph-wrap" id="graphWrap">
+        <div class="graph-title">
+          <h3>Visual check</h3>
+          <div class="legend"><span class="parent">Parent</span><span>Transformed</span></div>
+        </div>
+        <canvas id="graph" width="1000" height="520"></canvas>
+        <div class="small-note">The parent function is shown in blue; the transformed function is shown in purple. Discontinuities and domain restrictions are handled automatically.</div>
+      </div>
+    </div>
+  </main>
+  <div class="footer-note">Generated problems use clean integer and fractional scale factors. Ambiguous reflection examples are avoided.</div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const FUNCTIONS = [
+    {id:"linear", name:"Linear / Identity", core:true,  parent:"f(x) = x", eval:x=>x},
+    {id:"quadratic", name:"Quadratic", core:true, parent:"f(x) = x²", eval:x=>x*x},
+    {id:"cubic", name:"Cubic", core:true, parent:"f(x) = x³", eval:x=>x*x*x},
+    {id:"sqrt", name:"Square Root", core:true, parent:"f(x) = √x", eval:x=>x < 0 ? NaN : Math.sqrt(x)},
+    {id:"cbrt", name:"Cube Root", core:true, parent:"f(x) = ∛x", eval:x=>Math.cbrt(x)},
+    {id:"abs", name:"Absolute Value", core:true, parent:"f(x) = |x|", eval:x=>Math.abs(x)},
+    {id:"exp", name:"Exponential", core:true, parent:"f(x) = eˣ", eval:x=>Math.exp(x)},
+    {id:"ln", name:"Natural Logarithm", core:true, parent:"f(x) = ln(x)", eval:x=>x <= 0 ? NaN : Math.log(x)},
+    {id:"recip", name:"Reciprocal", core:true, parent:"f(x) = 1/x", eval:x=>Math.abs(x)<1e-10 ? NaN : 1/x},
+    {id:"sin", name:"Sine", core:false, parent:"f(x) = sin(x)", eval:x=>Math.sin(x)},
+    {id:"cos", name:"Cosine", core:false, parent:"f(x) = cos(x)", eval:x=>Math.cos(x)},
+    {id:"recip2", name:"Reciprocal Squared", core:false, parent:"f(x) = 1/x²", eval:x=>Math.abs(x)<1e-10 ? NaN : 1/(x*x)},
+    {id:"constant", name:"Constant", core:false, parent:"f(x) = 2", eval:x=>2}
+  ];
+
+  const OPTIONAL = new Set(["sin","cos","recip2","constant"]);
+  const SCALE_OPTIONS = [
+    {coef:2, kind:"compression", factor:"1/2"},
+    {coef:3, kind:"compression", factor:"1/3"},
+    {coef:4, kind:"compression", factor:"1/4"},
+    {coef:0.5, kind:"stretch", factor:"2"},
+    {coef:1/3, kind:"stretch", factor:"3"},
+    {coef:0.25, kind:"stretch", factor:"4"}
+  ];
+  const VERTICAL_OPTIONS = [
+    {coef:2, kind:"stretch", factor:"2"},
+    {coef:3, kind:"stretch", factor:"3"},
+    {coef:4, kind:"stretch", factor:"4"},
+    {coef:0.5, kind:"compression", factor:"1/2"},
+    {coef:1/3, kind:"compression", factor:"1/3"},
+    {coef:0.25, kind:"compression", factor:"1/4"}
+  ];
+
+  const state = {
+    difficulty:"basic",
+    practiceMode:"recognize4",
+    displayMode:"equation",
+    transformCount:1,
+    correct:0, attempted:0, streak:0,
+    answered:false,
+    problem:null,
+    selectedChoice:null,
+    selectedMulti:new Set(),
+    builderSelected:[]
+  };
+
+  const $ = id => document.getElementById(id);
+  const rand = arr => arr[Math.floor(Math.random()*arr.length)];
+  const shuffle = arr => [...arr].sort(()=>Math.random()-.5);
+  const signed = n => n > 0 ? `+ ${fmtNum(n)}` : `− ${fmtNum(Math.abs(n))}`;
+  const fmtNum = n => {
+    if (Math.abs(n-1/3)<1e-8) return "1/3";
+    if (Math.abs(n-1/4)<1e-8) return "1/4";
+    if (Math.abs(n-1/2)<1e-8) return "1/2";
+    return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(3)));
+  };
+  const coefText = c => {
+    const a=Math.abs(c);
+    if (a===1) return c<0 ? "−" : "";
+    return (c<0 ? "−" : "") + fmtNum(a);
+  };
+
+  function initFunctionToggles(){
+    const box=$("functionToggles");
+    FUNCTIONS.forEach(fn=>{
+      const label=document.createElement("label");
+      label.className="toggle-line";
+      const input=document.createElement("input");
+      input.type="checkbox";
+      input.id=`fn_${fn.id}`;
+      input.checked=fn.core;
+      input.addEventListener("change",()=>{
+        if(getEnabledFunctions().length===0){ input.checked=true; return; }
+        newProblem();
+      });
+      label.append(input,document.createTextNode(" "+fn.name+(OPTIONAL.has(fn.id)?" (optional)":"")));
+      box.appendChild(label);
+    });
+  }
+
+  function getEnabledFunctions(){
+    return FUNCTIONS.filter(fn=>$(`fn_${fn.id}`)?.checked);
+  }
+  function activeFamilies(){
+    const out=[];
+    if($("famTranslation").checked) out.push("translation");
+    if($("famFlip").checked) out.push("flip");
+    if($("famVertical").checked) out.push("vertical");
+    if($("famHorizontal").checked) out.push("horizontal");
+    return out;
+  }
+
+  function enforceFamilies(changed){
+    if(activeFamilies().length===0){
+      changed.checked=true;
+      return;
+    }
+    newProblem();
+  }
+
+  function applyDifficulty(level){
+    state.difficulty=level;
+    if(level==="basic"){
+      $("famTranslation").checked=true; $("famFlip").checked=false;
+      $("famVertical").checked=false; $("famHorizontal").checked=false;
+      setTransformCount(1);
+    } else if(level==="intermediate"){
+      $("famTranslation").checked=true; $("famFlip").checked=true;
+      $("famVertical").checked=true; $("famHorizontal").checked=false;
+      if(state.transformCount>2) setTransformCount(2);
+    } else if(level==="advanced"){
+      $("famTranslation").checked=true; $("famFlip").checked=true;
+      $("famVertical").checked=true; $("famHorizontal").checked=true;
+      if(state.transformCount<2) setTransformCount(2);
+    } else {
+      $("famTranslation").checked=true; $("famFlip").checked=true;
+      $("famVertical").checked=true; $("famHorizontal").checked=true;
+    }
+    updateDifficultyButtons();
+    newProblem();
+  }
+
+  function setTransformCount(n){
+    state.transformCount=Number(n);
+    document.querySelectorAll("#transformCount button").forEach(b=>b.classList.toggle("active",Number(b.dataset.value)===state.transformCount));
+  }
+
+  function updateDifficultyButtons(){
+    document.querySelectorAll("#difficulty button").forEach(b=>b.classList.toggle("active",b.dataset.value===state.difficulty));
+  }
+
+  function isYReflectionAmbiguous(fn){
+    return ["quadratic","abs","cos","recip2","constant"].includes(fn.id);
+  }
+  function isXReflectionAmbiguous(fn){
+    return ["constant"].includes(fn.id);
+  }
+  function familyCandidates(fn){
+    const fams=activeFamilies();
+    const items=[];
+    if(fams.includes("translation")) items.push("horizontalShift","verticalShift");
+    if(fams.includes("flip")){
+      if(!isXReflectionAmbiguous(fn)) items.push("reflectX");
+      if(!isYReflectionAmbiguous(fn)) items.push("reflectY");
+    }
+    if(fams.includes("vertical") && fn.id!=="constant") items.push("verticalScale");
+    if(fams.includes("horizontal") && fn.id!=="constant") items.push("horizontalScale");
+    return items;
+  }
+
+  function generateProblem(){
+    let fn=rand(getEnabledFunctions());
+    let candidates=familyCandidates(fn);
+    let guard=0;
+    while(candidates.length===0 && guard++<20){
+      fn=rand(getEnabledFunctions());
+      candidates=familyCandidates(fn);
+    }
+    const count=Math.min(state.transformCount, candidates.length);
+    const picked=shuffle(candidates).slice(0,count);
+
+    let h=0,k=0,a=1,b=1;
+    const descriptors=[];
+
+    picked.forEach(type=>{
+      if(type==="horizontalShift"){
+        const amount=rand([1,2,3,4,5]);
+        const dir=rand(["left","right"]);
+        h=dir==="right" ? amount : -amount;
+        descriptors.push({type,label:`Shift ${dir} ${amount}`});
+      }
+      if(type==="verticalShift"){
+        const amount=rand([1,2,3,4,5]);
+        const dir=rand(["up","down"]);
+        k=dir==="up" ? amount : -amount;
+        descriptors.push({type,label:`Shift ${dir} ${amount}`});
+      }
+      if(type==="reflectX"){
+        a*=-1;
+        descriptors.push({type,label:"Reflect over x-axis"});
+      }
+      if(type==="reflectY"){
+        b*=-1;
+        descriptors.push({type,label:"Reflect over y-axis"});
+      }
+      if(type==="verticalScale"){
+        const o=rand(VERTICAL_OPTIONS);
+        a*=o.coef;
+        descriptors.push({type,label:`Vertical ${o.kind} by a factor of ${o.factor}`});
+      }
+      if(type==="horizontalScale"){
+        const o=rand(SCALE_OPTIONS);
+        b*=o.coef;
+        descriptors.push({type,label:`Horizontal ${o.kind} by a factor of ${o.factor}`});
+      }
+    });
+
+    descriptors.sort((x,y)=>{
+      const order={reflectX:0,reflectY:1,verticalScale:2,horizontalScale:3,horizontalShift:4,verticalShift:5};
+      return order[x.type]-order[y.type];
+    });
+
+    return {fn,h,k,a,b,descriptors};
+  }
+
+  function innerDisplay(p){
+    const {b,h}=p;
+    let base;
+    if(h===0) base="x";
+    else if(h>0) base=`(x − ${h})`;
+    else base=`(x + ${Math.abs(h)})`;
+    if(b===1) return base;
+    if(b===-1) return `−${base}`;
+    return `${coefText(b)}${base}`;
+  }
+
+  function actualEquation(p){
+    const inner=innerDisplay(p);
+    let core="";
+    switch(p.fn.id){
+      case "linear": core=inner; break;
+      case "quadratic": core=`${wrapPowerBase(inner)}²`; break;
+      case "cubic": core=`${wrapPowerBase(inner)}³`; break;
+      case "sqrt": core=`√(${inner})`; break;
+      case "cbrt": core=`∛(${inner})`; break;
+      case "abs": core=`|${inner}|`; break;
+      case "exp": core=`e^(${inner})`; break;
+      case "ln": core=`ln(${inner})`; break;
+      case "recip": core=`1/(${inner})`; break;
+      case "sin": core=`sin(${inner})`; break;
+      case "cos": core=`cos(${inner})`; break;
+      case "recip2": core=`1/(${wrapPowerBase(inner)}²)`; break;
+      case "constant": core="2"; break;
+    }
+    let expr=core;
+    if(p.a!==1){
+      if(p.a===-1) expr=`−${core}`;
+      else expr=`${coefText(p.a)}·${core}`;
+    }
+    if(p.k!==0) expr+=` ${signed(p.k)}`;
+    return `y = ${expr}`;
+  }
+
+  function wrapPowerBase(s){
+    if(s==="x") return "x";
+    if(s==="−x") return "(−x)";
+    return s.startsWith("(") && s.endsWith(")") ? s : `(${s})`;
+  }
+
+  function functionNotation(p){
+    let inside="x";
+    if(p.h!==0) inside=p.h>0?`(x − ${p.h})`:`(x + ${Math.abs(p.h)})`;
+    if(p.b!==1){
+      if(p.b===-1) inside=`−${inside}`;
+      else inside=`${coefText(p.b)}${inside}`;
+    }
+    let expr=`f(${inside})`;
+    if(p.a!==1){
+      expr=p.a===-1?`−${expr}`:`${coefText(p.a)}·${expr}`;
+    }
+    if(p.k!==0) expr+=` ${signed(p.k)}`;
+    return `g(x) = ${expr}`;
+  }
+
+  function description(p){
+    return p.descriptors.map(d=>d.label).join("; ");
+  }
+
+  function renderEquation(){
+    const p=state.problem;
+    const box=$("equationBox");
+    box.innerHTML="";
+    if(state.displayMode==="equation" || state.displayMode==="both"){
+      const d=document.createElement("div"); d.className="equation"; d.textContent=actualEquation(p); box.appendChild(d);
+    }
+    if(state.displayMode==="function" || state.displayMode==="both"){
+      const d=document.createElement("div"); d.className=state.displayMode==="function"?"equation":"notation"; d.textContent=functionNotation(p); box.appendChild(d);
+    }
+  }
+
+  function wrongLabel(label){
+    if(label.startsWith("Shift left")) return label.replace("left","right");
+    if(label.startsWith("Shift right")) return label.replace("right","left");
+    if(label.startsWith("Shift up")) return label.replace("up","down");
+    if(label.startsWith("Shift down")) return label.replace("down","up");
+    if(label==="Reflect over x-axis") return "Reflect over y-axis";
+    if(label==="Reflect over y-axis") return "Reflect over x-axis";
+    if(label.startsWith("Vertical stretch")) return label.replace("Vertical stretch","Vertical compression");
+    if(label.startsWith("Vertical compression")) return label.replace("Vertical compression","Vertical stretch");
+    if(label.startsWith("Horizontal stretch")) return label.replace("Horizontal stretch","Horizontal compression");
+    if(label.startsWith("Horizontal compression")) return label.replace("Horizontal compression","Horizontal stretch");
+    return label;
+  }
+
+  function randomDescriptor(){
+    const amount=rand([1,2,3,4,5]);
+    const options=[
+      `Shift left ${amount}`,`Shift right ${amount}`,`Shift up ${amount}`,`Shift down ${amount}`,
+      "Reflect over x-axis","Reflect over y-axis",
+      `Vertical stretch by a factor of ${rand(["2","3","4"])}`,
+      `Vertical compression by a factor of ${rand(["1/2","1/3","1/4"])}`,
+      `Horizontal stretch by a factor of ${rand(["2","3","4"])}`,
+      `Horizontal compression by a factor of ${rand(["1/2","1/3","1/4"])}`
+    ];
+    return rand(options);
+  }
+
+  function makeChoiceSets(n){
+    const correct=description(state.problem);
+    const set=new Set([correct]);
+    const ds=state.problem.descriptors;
+    if(ds.length){
+      const mutated=ds.map((d,i)=>i===0?wrongLabel(d.label):d.label).join("; ");
+      set.add(mutated);
+      const mutated2=ds.map((d,i)=>i===ds.length-1?wrongLabel(d.label):d.label).join("; ");
+      set.add(mutated2);
+    }
+    while(set.size<n){
+      const fake=[];
+      for(let i=0;i<ds.length;i++) fake.push(randomDescriptor());
+      set.add(fake.join("; "));
+    }
+    return shuffle([...set]).slice(0,n);
+  }
+
+  function renderResponse(){
+    const area=$("responseArea");
+    area.innerHTML="";
+    state.selectedChoice=null;
+    state.selectedMulti=new Set();
+    state.builderSelected=[];
+
+    const mode=state.practiceMode;
+    if(mode==="recognize4" || mode==="recognize6" || mode==="match"){
+      const n=mode==="recognize6"?6:4;
+      $("promptText").textContent=mode==="match" ? "Match the equation to its complete transformation description." : "Which transformation description matches the equation?";
+      const choices=document.createElement("div"); choices.className="choices";
+      makeChoiceSets(n).forEach(text=>{
+        const b=document.createElement("button"); b.className="choice"; b.textContent=text;
+        b.addEventListener("click",()=>{
+          if(state.answered)return;
+          document.querySelectorAll(".choice").forEach(x=>x.classList.remove("selected"));
+          b.classList.add("selected"); state.selectedChoice=text;
+        });
+        choices.appendChild(b);
+      });
+      area.appendChild(choices);
+    } else if(mode==="identify"){
+      $("promptText").textContent="Select every transformation shown in the equation.";
+      const pool=new Set(state.problem.descriptors.map(d=>d.label));
+      while(pool.size<Math.max(8,state.problem.descriptors.length+4)) pool.add(randomDescriptor());
+      const grid=document.createElement("div"); grid.className="multi-grid";
+      shuffle([...pool]).forEach(text=>{
+        const b=document.createElement("button"); b.className="multi-chip"; b.textContent=text;
+        b.addEventListener("click",()=>{
+          if(state.answered)return;
+          if(state.selectedMulti.has(text)){state.selectedMulti.delete(text);b.classList.remove("selected");}
+          else{state.selectedMulti.add(text);b.classList.add("selected");}
+        });
+        grid.appendChild(b);
+      });
+      area.appendChild(grid);
+    } else if(mode==="build"){
+      $("promptText").textContent="Build the complete transformation description by selecting the needed pieces.";
+      const holder=document.createElement("div"); holder.className="builder";
+      const row=document.createElement("div");row.className="builder-row";
+      const slot=document.createElement("div");slot.className="builder-slot";slot.id="builderSlot";
+      row.appendChild(slot);holder.appendChild(row);
+      const bank=document.createElement("div");bank.className="builder-row";
+      const pool=new Set(state.problem.descriptors.map(d=>d.label));
+      while(pool.size<10) pool.add(randomDescriptor());
+      shuffle([...pool]).forEach(text=>{
+        const b=document.createElement("button");b.className="builder-token";b.textContent=text;b.dataset.token=text;
+        b.addEventListener("click",()=>{
+          if(state.answered||b.classList.contains("used"))return;
+          state.builderSelected.push(text);b.classList.add("used");renderBuilderSlot();
+        });
+        bank.appendChild(b);
+      });
+      holder.appendChild(bank);area.appendChild(holder);renderBuilderSlot();
+    }
+  }
+
+  function renderBuilderSlot(){
+    const slot=$("builderSlot");if(!slot)return;
+    slot.innerHTML="";
+    if(!state.builderSelected.length){slot.textContent="Your transformation description";return;}
+    state.builderSelected.forEach((text,index)=>{
+      const b=document.createElement("button");b.className="builder-token";b.textContent=text;
+      b.title="Click to remove";
+      b.addEventListener("click",()=>{
+        if(state.answered)return;
+        state.builderSelected.splice(index,1);
+        document.querySelectorAll(".builder-token[data-token]").forEach(x=>{
+          if(x.dataset.token===text)x.classList.remove("used");
+        });
+        renderBuilderSlot();
+      });
+      slot.appendChild(b);
+    });
+  }
+
+  function arraysEqualUnordered(a,b){
+    if(a.length!==b.length)return false;
+    const sa=[...a].sort(), sb=[...b].sort();
+    return sa.every((x,i)=>x===sb[i]);
+  }
+
+  function checkAnswer(){
+    if(state.answered)return;
+    const correctLabels=state.problem.descriptors.map(d=>d.label);
+    let isCorrect=false, hasAnswer=true;
+    if(["recognize4","recognize6","match"].includes(state.practiceMode)){
+      hasAnswer=state.selectedChoice!==null;
+      isCorrect=state.selectedChoice===description(state.problem);
+    } else if(state.practiceMode==="identify"){
+      hasAnswer=state.selectedMulti.size>0;
+      isCorrect=arraysEqualUnordered([...state.selectedMulti],correctLabels);
+    } else {
+      hasAnswer=state.builderSelected.length>0;
+      isCorrect=arraysEqualUnordered(state.builderSelected,correctLabels);
+    }
+    if(!hasAnswer){
+      showFeedback(false,"Choose an answer before checking.",false);
+      return;
+    }
+
+    state.answered=true;
+    state.attempted++;
+    if(isCorrect){state.correct++;state.streak++;}else state.streak=0;
+    updateStats();
+    markAnswers();
+    showFeedback(isCorrect,isCorrect?"Correct.":"Not quite.",true);
+    $("graphWrap").classList.add("show");
+    drawGraph();
+    $("checkBtn").disabled=true;
+  }
+
+  function markAnswers(){
+    const correct=description(state.problem);
+    if(["recognize4","recognize6","match"].includes(state.practiceMode)){
+      document.querySelectorAll(".choice").forEach(b=>{
+        if(b.textContent===correct)b.classList.add("correct");
+        else if(b.textContent===state.selectedChoice)b.classList.add("wrong");
+      });
+    } else if(state.practiceMode==="identify"){
+      const correctSet=new Set(state.problem.descriptors.map(d=>d.label));
+      document.querySelectorAll(".multi-chip").forEach(b=>{
+        if(correctSet.has(b.textContent))b.classList.add("correct");
+        if(b.classList.contains("selected")&&!correctSet.has(b.textContent))b.classList.add("wrong");
+      });
+    }
+  }
+
+  function showFeedback(good,title,includeAnswer){
+    const f=$("feedback");
+    f.className=`feedback show ${good?"good":"bad"}`;
+    f.innerHTML=`<strong>${title}</strong>`+(includeAnswer?`<span>${escapeHtml(description(state.problem))}</span>`:"");
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  function updateStats(){
+    $("correctStat").textContent=state.correct;
+    $("attemptStat").textContent=state.attempted;
+    $("streakStat").textContent=state.streak;
+    $("accuracyStat").textContent=state.attempted?`${Math.round(100*state.correct/state.attempted)}%`:"—";
+  }
+
+  function newProblem(){
+    state.problem=generateProblem();
+    state.answered=false;
+    $("checkBtn").disabled=false;
+    $("feedback").className="feedback";
+    $("graphWrap").classList.remove("show");
+    $("parentName").textContent=`${state.problem.fn.name}  ·  ${state.problem.fn.parent}`;
+    renderEquation();
+    renderResponse();
+    const count=state.problem.descriptors.length;
+    $("difficultyBadge").textContent=`${capitalize(state.difficulty)} · ${count} transformation${count===1?"":"s"}`;
+    const titles={
+      recognize4:"Recognize the transformation",
+      recognize6:"Recognize the transformation",
+      identify:"Identify all transformations",
+      build:"Build the transformation description",
+      match:"Match equation and description"
+    };
+    $("problemTitle").textContent=titles[state.practiceMode];
+  }
+
+  function capitalize(s){return s[0].toUpperCase()+s.slice(1)}
+
+  function transformedEval(p,x){
+    const u=p.b*(x-p.h);
+    const y=p.fn.eval(u);
+    return Number.isFinite(y)?p.a*y+p.k:NaN;
+  }
+
+  function cssVar(name){return getComputedStyle(document.body).getPropertyValue(name).trim()}
+
+  function drawGraph(){
+    const canvas=$("graph"),ctx=canvas.getContext("2d"),p=state.problem;
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=cssVar("--panel2");ctx.fillRect(0,0,W,H);
+
+    const xMin=-10,xMax=10,yMin=-10,yMax=10;
+    const X=x=>(x-xMin)/(xMax-xMin)*W;
+    const Y=y=>H-(y-yMin)/(yMax-yMin)*H;
+
+    ctx.strokeStyle=cssVar("--border");ctx.lineWidth=1;
+    for(let i=-10;i<=10;i++){
+      if(i===0)continue;
+      ctx.beginPath();ctx.moveTo(X(i),0);ctx.lineTo(X(i),H);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,Y(i));ctx.lineTo(W,Y(i));ctx.stroke();
+    }
+    ctx.strokeStyle=cssVar("--muted");ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,Y(0));ctx.lineTo(W,Y(0));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X(0),0);ctx.lineTo(X(0),H);ctx.stroke();
+
+    ctx.fillStyle=cssVar("--muted");ctx.font="22px system-ui";
+    ctx.fillText("x",W-25,Y(0)-10);ctx.fillText("y",X(0)+10,24);
+    [-5,5].forEach(v=>{ctx.fillText(String(v),X(v)-8,Y(0)+26);ctx.fillText(String(v),X(0)+9,Y(v)+7)});
+
+    plotFunction(x=>p.fn.eval(x),cssVar("--blue"),3,true);
+    plotFunction(x=>transformedEval(p,x),cssVar("--purple2"),4,false);
+
+    function plotFunction(fn,color,width,dashed){
+      ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dashed?[11,8]:[]);
+      let drawing=false,prevY=null;
+      const steps=1800;
+      for(let i=0;i<=steps;i++){
+        const x=xMin+(xMax-xMin)*i/steps;
+        const y=fn(x);
+        const px=X(x),py=Y(y);
+        const valid=Number.isFinite(y)&&y>yMin-4&&y<yMax+4;
+        const jump=prevY!==null && Math.abs(py-prevY)>H*.42;
+        if(!valid||jump){drawing=false;prevY=valid?py:null;continue}
+        if(!drawing){ctx.beginPath();ctx.moveTo(px,py);drawing=true}
+        else ctx.lineTo(px,py);
+        prevY=py;
+      }
+      if(drawing)ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // segmented controls
+  document.querySelectorAll("#difficulty button").forEach(b=>b.addEventListener("click",()=>applyDifficulty(b.dataset.value)));
+  document.querySelectorAll("#practiceMode button").forEach(b=>b.addEventListener("click",()=>{
+    state.practiceMode=b.dataset.value;
+    document.querySelectorAll("#practiceMode button").forEach(x=>x.classList.toggle("active",x===b));
+    newProblem();
+  }));
+  document.querySelectorAll("#displayMode button").forEach(b=>b.addEventListener("click",()=>{
+    state.displayMode=b.dataset.value;
+    document.querySelectorAll("#displayMode button").forEach(x=>x.classList.toggle("active",x===b));
+    renderEquation();
+  }));
+  document.querySelectorAll("#transformCount button").forEach(b=>b.addEventListener("click",()=>{
+    setTransformCount(b.dataset.value);newProblem();
+  }));
+  document.querySelectorAll("#appearance button").forEach(b=>b.addEventListener("click",()=>{
+    const dark=b.dataset.value==="dark";document.body.classList.toggle("dark",dark);
+    document.querySelectorAll("#appearance button").forEach(x=>x.classList.toggle("active",x===b));
+    if(state.answered)drawGraph();
+  }));
+  ["famTranslation","famFlip","famVertical","famHorizontal"].forEach(id=>$(id).addEventListener("change",e=>enforceFamilies(e.target)));
+
+  $("checkBtn").addEventListener("click",checkAnswer);
+  $("newBtn").addEventListener("click",()=>{
+    if(!state.answered && (state.selectedChoice!==null || state.selectedMulti.size || state.builderSelected.length)){
+      state.attempted++;state.streak=0;updateStats();
+    }
+    newProblem();
+  });
+  $("resetStats").addEventListener("click",()=>{
+    state.correct=0;state.attempted=0;state.streak=0;updateStats();
+  });
+
+  initFunctionToggles();
+  updateStats();
+  newProblem();
+})();
+</script>
+</body>
+</html>
